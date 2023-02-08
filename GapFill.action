@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ActionCollection version="2" name="Scripts">
+    <Actions category="Scripts">
+        <text>Gap Fill</text>
+
+        <Action name="gapFillAction">
+        <icon></icon>
+        <text>Gap Fill</text>
+        <whatsThis></whatsThis>
+        <toolTip>Fills gaps in line art</toolTip>
+        <iconText></iconText>
+        <activationFlags>0000</activationFlags>
+        <activationConditions>0</activationConditions>
+        <shortcut>ctrl+/</shortcut>
+        <isCheckable>false</isCheckable>
+        <statusTip></statusTip>
+        </Action>
+    </Actions>
+</ActionCollection>
