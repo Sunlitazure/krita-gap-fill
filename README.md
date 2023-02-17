@@ -26,7 +26,7 @@ Addon is found in Tools -> Scripts -> Gap Fill
 	- Process may take several seconds, don't do anything until it generates the "Gap Fill" layer
 5. When the tool completes it will turn the line art layer(s) light gray and create a new "Gap Fill" layer with 1% opacity below it. (If you selected a group layer it will be in the group at the bottom)
 	- you can change the opacity to 100% to check the success of the gap fill
-		-use the paint tool to fill in any missed gaps
+	- use the paint tool to fill in any missed gaps
 6. You can now fill in the line art on any layer by using the "Enclose and Fill Tool" with the following settings
 	- What to fill: All regions
 	- Reference: Tag icon (Obtain the region using a merged copy of the selected color-labeled layers)
