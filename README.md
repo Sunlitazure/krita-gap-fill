@@ -36,7 +36,7 @@ Addon is found in Tools -> Scripts -> Gap Fill
 ## Future improvements
 
 - If lots of gaps are missed in real use cases, I may add a dialog box to choose gap distance
-- Remove excessive screen freshing to speed up process
+- Remove excessive screen refreshing to speed up process
 
 
 
