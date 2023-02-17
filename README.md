@@ -9,8 +9,8 @@ For use with the "Enclose and Fill Tool" that currently doesn't support gap fill
 
 On Windows:
 
-1. Place GapFill folder and GapFill.desktop in C:\Users\%USERPROFILE%\AppData\Roaming\krita\pykrita 
-2. Place GapFill.action in C:\Users\%USERPROFILE%\AppData\Roaming\krita\actions
+1. Place GapFill folder and GapFill.desktop in C:\Users\\%USERPROFILE%\AppData\Roaming\krita\pykrita 
+2. Place GapFill.action in C:\Users\\%USERPROFILE%\AppData\Roaming\krita\actions
 
 If the pykrita or actions folder don't already exist, create them.
 
