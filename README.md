@@ -29,6 +29,8 @@ Addon is found in Tools -> Scripts -> Gap Fill
 	- use the paint tool to fill in any missed gaps
 6. You can now fill in the line art on any layer by using the "Enclose and Fill Tool" with the following settings
 	- What to fill: All regions
+	- Adjustments:
+		- set to -2 to -4 to prevent it from spilling outside the lines
 	- Reference: Tag icon (Obtain the region using a merged copy of the selected color-labeled layers)
 		- click the gray label color box
 

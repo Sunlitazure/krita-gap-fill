@@ -19,41 +19,90 @@ class GapFill(Extension):
 		
 	def gapFillMethod(self):
 		#for layer in self.currentDoc.topLevelNodes():
-		#   if layer == self.currentDoc.activeNode():
-		#        lineArtLayer = layer
-		 #   if 
+		#	if layer == self.currentDoc.activeNode():
+		#		 lineArtLayer = layer
+		 #	 if 
 		 
 		self.currentDoc = self.app.activeDocument()
 		 
-		lineArtLayer = self.currentDoc.activeNode()
+		lineArtLayer_orig = self.currentDoc.activeNode()		
+		lineArtLayer_orig.setColorLabel(8) #gray label
 		
-		gapFillLayer = self.currentDoc.createNode("Gap Fill", "paintlayer")    
+
+		self.app.action('duplicatelayer').trigger()
+		self.currentDoc.waitForDone()
+		layersList = self.currentDoc.activeNode().parentNode().childNodes()
+		for i in range(len(layersList)):
+			if layersList[i] == lineArtLayer_orig:
+				self.lineart_orig_ind = i
+				lineArtLayer = layersList[i+1]
+				break
+		
+		selection = Selection() #required to refresh the GUI layer list
+		self.currentDoc.setSelection(selection)
+		self.currentDoc.setActiveNode(lineArtLayer)
+		
+		#newDialog = QDialog() # create dialog and assign it to a variable
+		#newDialog.setWindowTitle(lineArtLayer.name())
+		#newDialog.exec_() # show the dialog
+		if type(lineArtLayer) == GroupLayer:
+			self.currentDoc.setActiveNode(lineArtLayer)
+			self.app.action('merge_layer').trigger()
+			self.currentDoc.waitForDone()
+			
+			self.currentDoc.setActiveNode(layersList[self.lineart_orig_ind])
+			layersList = self.currentDoc.activeNode().parentNode().childNodes()
+			lineArtLayer = layersList[self.lineart_orig_ind + 1]
+			
+			self.app.action('deselect').trigger()
+			self.currentDoc.waitForDone()
+			selection = Selection() #required to refresh the GUI layer list
+			self.currentDoc.setSelection(selection)
+			self.currentDoc.setActiveNode(lineArtLayer)
+
+		parent = lineArtLayer.parentNode()
+		
+		self.app.action('split_alpha_into_mask').trigger()
+		self.currentDoc.waitForDone()
+		self.currentDoc.setActiveNode(layersList[self.lineart_orig_ind])
+		layersList = self.currentDoc.activeNode().parentNode().childNodes()
+		lineArtLayer = layersList[self.lineart_orig_ind + 1]
+		self.app.action('deselect').trigger()
+		self.currentDoc.waitForDone()
+		selection = Selection() #required to refresh the GUI layer list
+		self.currentDoc.setSelection(selection)
+		self.currentDoc.setActiveNode(lineArtLayer.childNodes()[0])
+		
+		self.thresholdFilter(self.currentDoc.activeNode(), 5) #get rid of pixels with alpha less than 5
+		self.app.action('split_alpha_write').trigger()
+		self.currentDoc.waitForDone()
+		self.currentDoc.setActiveNode(layersList[self.lineart_orig_ind])
+		layersList = self.currentDoc.activeNode().parentNode().childNodes()
+		lineArtLayer = layersList[self.lineart_orig_ind + 1]
+		
+		gapFillLayer = self.currentDoc.createNode("Gap Fill", "paintlayer")
 		self.currentDoc.rootNode().addChildNode(gapFillLayer, None)
 		
-		self.currentDoc.waitForDone ( )
+		self.currentDoc.waitForDone()
 		self.currentDoc.refreshProjection()
 		
+		self.app.action('deselect').trigger()
+		self.currentDoc.waitForDone()
 		selection = Selection()
 		self.currentDoc.setSelection(selection)
-		
-		if type(lineArtLayer) == GroupLayer:
-			parent = lineArtLayer
-			if len(parent.childNodes()) != 0:
-				bottomLayer = parent.childNodes()[-1]
-		else:
-			bottomLayer = lineArtLayer
-			parent = bottomLayer.parentNode()
 
 		self.currentDoc.setActiveNode(lineArtLayer)
+		
 
 		self.app.action("selectopaque").trigger() 
 		self.currentDoc.waitForDone ( )
 		#self.currentDoc.refreshProjection()
+		
 				
 		for layer in self.currentDoc.topLevelNodes():
 			if type(layer) == SelectionMask:
 				self.currentDoc.setActiveNode(layer)
-				self.thresholdFilter(layer)
+				self.thresholdFilter(layer, 0)
 				self.currentDoc.refreshProjection()
 				break
 
@@ -77,6 +126,7 @@ class GapFill(Extension):
 		self.currentDoc.waitForDone ( )
 		#self.currentDoc.refreshProjection()
 		
+		
 		self.currentDoc.setActiveNode(lineArtLayer)
 		#self.currentDoc.refreshProjection()
 		
@@ -88,7 +138,7 @@ class GapFill(Extension):
 		for layer in self.currentDoc.topLevelNodes():
 			if type(layer) == SelectionMask:
 				self.currentDoc.setActiveNode(layer)
-				self.thresholdFilter(layer)
+				self.thresholdFilter(layer, 0)
 				self.currentDoc.refreshProjection()
 				break
 				
@@ -116,27 +166,29 @@ class GapFill(Extension):
 		
 		
 		self.currentDoc.rootNode().removeChildNode(gapFillLayer)
-		parent.addChildNode(gapFillLayer, bottomLayer)
-		if type(lineArtLayer) != GroupLayer:
-			parent.removeChildNode(bottomLayer)
-			parent.addChildNode(bottomLayer, gapFillLayer)
-			#self.currentDoc.refreshProjection()
+		parent.addChildNode(gapFillLayer, lineArtLayer)
+		parent.removeChildNode(lineArtLayer)
+		parent.addChildNode(lineArtLayer, gapFillLayer)
+		#self.currentDoc.refreshProjection()
 		
 		gapFillLayer.setOpacity(3)
 		#self.currentDoc.refreshProjection()
-		
-		lineArtLayer.setColorLabel(8) #gray label
+		gapFillLayer.setColorLabel(8) #gray label
 		#for layer in lineArtLayer.childNodes():
 		#	layer.setColorLabel(8)
+		
+		self.currentDoc.setActiveNode(lineArtLayer)
+		self.app.action('remove_layer').trigger()
+		
 		self.currentDoc.refreshProjection()
 		
 		
 		
-	def thresholdFilter(self, layer):
+	def thresholdFilter(self, layer, value):
 		filter = self.app.filter('threshold')
 		filterConfig = filter.configuration()
 		#print(filterConfig.properties())
-		filterConfig.setProperty('threshold', 0)
+		filterConfig.setProperty('threshold', value)
 		filter.setConfiguration(filterConfig)
 		filter.apply(layer, 0, 0, self.currentDoc.width(), self.currentDoc.height())
 		self.currentDoc.refreshProjection()
